@@ -28,10 +28,10 @@
             </ul>
         </div>
         <!-- form-add-product -->
-        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.product.update') }}">
+        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.product.update',$product->id) }}">
             @csrf
             @method('PUT')
-            <input type="hidden" name="product_id" value="{{$product->id}}"/>
+            <input type="hidden" name="id" value="{{$product->id}}"/>
             <div class="wg-box">
                 <fieldset class="name">
                     <div class="body-title mb-10">Product name <span class="tf-color-1">*</span>
@@ -208,7 +208,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('script')
     <script>
         $(function() {
             $("#myFile").on('change',function(e) {
@@ -221,11 +221,13 @@
                 }
             });
 
-            $("#gFile").on('change',function(e) {
-                const photoInp = $("#gFile");
-                const [file] = this.files;
-                $.each(gphoto,function(index,val){
-                    $("#galUpload").prepend(`<div class="item gitems"><img src="${URL.createObjectURL(val)}"></div>`);
+            $("#gFile").on('change', function () {
+            $("#galUpload .gitems").remove(); // clear preview cũ (nên có)
+
+            const files = this.files;
+            $.each(files, function (index, file) {
+                $("#galUpload").prepend(`
+                    <div class="item gitems"> <img src="${URL.createObjectURL(file)}" /></div>  `);
                 });
             });
 

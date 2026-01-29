@@ -77,7 +77,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('script')
     <script>
         $(function() {
             $("#myFile").on('change',function(e) {

@@ -1331,17 +1331,20 @@ function pureFadeOut(e) {
     return new bootstrap.Popover(popoverTriggerEl, {'html':true})
   });
 
-  $('.shopping-cart .btn-checkout').off('click').on('click', function() {
-    window.location.href='./shop_checkout.html';
-  });
+  // $('.shopping-cart .btn-checkout').off('click').on('click', function() {
+  //   window.location.href='./shop_checkout.html';
+  // });
 
-  $('.checkout-form .btn-checkout').off('click').on('click', function() {
-    window.location.href='./shop_order_complete.html';
-  });
+  // $('.checkout-form .btn-checkout').off('click').on('click', function() {
+  //   window.location.href='./shop_order_complete.html';
+  // });
 
-  document.querySelector('.js-show-register').addEventListener('click', function(e) {
-    document.querySelector(this.getAttribute("href")).click();
-  });
+  var jsShowRegister = document.querySelector('.js-show-register');
+  if(jsShowRegister) {
+    jsShowRegister.addEventListener('click', function(e) {
+      document.querySelector(this.getAttribute("href")).click();
+    });
+  }
 
   $('button.js-add-wishlist, a.add-to-wishlist').off('click').on('click', function() {
     if($(this).hasClass("active"))

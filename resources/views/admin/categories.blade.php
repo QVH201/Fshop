@@ -95,18 +95,18 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('script')
     <script>
         $(function(){
             $('.delete').on('click', function(e){
                 e.preventDefault();
                 var form = $(this).closest('form');
-                Swal({
+                swal({
                     title: "Are you sure?",
                     text: "You want to delete this record?",
-                    type: "warning",
-                    buttons: ["No","Yes"],
-                    confirmButtonColor: '#bdf25aff'
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                    dangerMode: true,
                 }).then(function(result) {
                     if (result) {
                         form.submit();

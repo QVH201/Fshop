@@ -117,7 +117,16 @@
             <p>{{$product->short_description}}</p>
           </div>
           @if(Cart::instance('cart')->content()->where('id',$product->id)->count()>0)
-            <a href="{{ route('cart.index') }}" class="btn btn-warning mb-3">Go to Cart</a>
+            <div class="product-single__addtocart">
+              <a href="{{ route('cart.index') }}" class="btn btn-warning btn-addtocart">Go to Cart</a>
+              <a href="{{ route('virtual-tryon.index', ['product_id' => $product->id]) }}" class="btn btn-outline-primary btn-addtocart ms-2 d-inline-flex align-items-center justify-content-center" style="min-width: 150px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="me-2" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20.2 17.6L18.7 5.6C18.6 4.7 17.9 4 17 4H7C6.1 4 5.4 4.7 5.3 5.6L3.8 17.6C3.6 18.8 4.6 19.9 5.8 19.9H18.2C19.4 19.9 20.4 18.8 20.2 17.6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M9 4V2H15V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Try On
+              </a>
+            </div>
           @else
           <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
             @csrf

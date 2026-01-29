@@ -81,7 +81,7 @@
                   </div>
                 </td>
                 <td>
-                  <span class="shopping-cart__subtotal">${{$item->subTotal()}}</span>
+                  <span class="shopping-cart__subtotal" id="subtotal-{{$item->rowId}}">${{$item->subTotal()}}</span>
                 </td>
                 <td>
                   <form method="POST" action="{{ route('cart.item.remove',['rowId'=>$item->rowId]) }}">
@@ -117,7 +117,7 @@
                 <tbody>
                   <tr>
                     <th>Subtotal</th>
-                    <td>${{Cart::instance('cart')->subtotal()}}</td>
+                    <td id="cart-subtotal">${{Cart::instance('cart')->subtotal()}}</td>
                   </tr>
                   <tr>
                     <th>Shipping</th>
@@ -126,18 +126,18 @@
                   </tr>
                   <tr>
                     <th>VAT</th>
-                    <td>${{Cart::instance('cart')->tax()}}</td>
+                    <td id="cart-tax">${{Cart::instance('cart')->tax()}}</td>
                   </tr>
                   <tr>
                     <th>Total</th>
-                    <td>${{Cart::instance('cart')->total()}}</td>
+                    <td id="cart-total">${{Cart::instance('cart')->total()}}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div class="mobile_fixed-btn_wrapper">
               <div class="button-wrapper container">
-                <a href="checkout.html" class="btn btn-primary btn-checkout">PROCEED TO CHECKOUT</a>
+                <a href="{{route('checkout.index')}}" class="btn btn-primary btn-checkout">PROCEED TO CHECKOUT</a>
               </div>
             </div>
           </div>
@@ -156,16 +156,89 @@
 @endsection
 
 @push('scripts')
-  <script>
+   <script>
     $(document).ready(function(){
-      $('.qty-control__reduce').on("click",function(){
-        $(this).closest('form').submit();
+      console.log('Cart JS loaded!'); // Verify script load
+
+      $(document).on("click", '.qty-control__reduce, .qty-control__increase', function(e){
+        e.preventDefault(); 
+        let $form = $(this).closest('form');
+        let $input = $form.closest('.qty-control').find('input[name="quantity"]');
+        
+        console.log('Clicked qty control. Sending AJAX request to:', $form.attr('action'));
+
+        $.ajax({
+          url: $form.attr('action'),
+          type: 'POST', 
+          headers: {'Accept': 'application/json'},
+          data: $form.serialize(),
+          dataType: 'json',
+          success: function(data){
+            console.log('AJAX Success:', data);
+            if(data.status == 'success'){
+              // Update item quantity input
+              $input.val(data.qty);
+              
+              // Update item subtotal
+              $('#subtotal-' + data.rowId).text('$' + data.item_subtotal);
+              
+              // Update cart totals
+              $('#cart-subtotal').text('$' + data.cart_subtotal);
+              $('#cart-tax').text('$' + data.cart_tax);
+              $('#cart-total').text('$' + data.cart_total);
+            } else {
+              console.log('Status not success, reloading...');
+              window.location.reload(); 
+            }
+          },
+          error: function(xhr, status, error){
+             console.log('Error updating cart:', error);
+             console.log('Response:', xhr.responseText);
+             // window.location.reload(); 
+          }
+        });
       });
-      $('.qty-control__increase').on("click",function(){
-        $(this).closest('form').submit();
-      });
-      $('.remove-cart').on("click",function(){
-        $(this).closest('form').submit();
+
+      $(document).on("click", '.remove-cart', function(e){
+        e.preventDefault(); 
+        let $form = $(this).closest('form');
+        let $tr = $(this).closest('tr');
+        
+        console.log('Clicked remove. Sending AJAX request to:', $form.attr('action'));
+
+        $.ajax({
+          url: $form.attr('action'),
+          type: 'POST', 
+          headers: {'Accept': 'application/json'},
+          data: $form.serialize(), // Includes _method=DELETE and _token
+          dataType: 'json',
+          success: function(data){
+            console.log('AJAX Remove Success:', data);
+            if(data.status == 'success'){
+              // Remove the row
+              $tr.remove();
+              
+              // Update cart totals
+              $('#cart-subtotal').text('$' + data.cart_subtotal);
+              $('#cart-tax').text('$' + data.cart_tax);
+              $('#cart-total').text('$' + data.cart_total);
+              
+              // Optional: Update badge count if exists
+              if(data.cart_count == 0) {
+                 window.location.reload(); // Show empty cart message
+              }
+              $('.js-cart-items-count').text(data.cart_count);
+
+            } else {
+              window.location.reload(); 
+            }
+          },
+          error: function(xhr, status, error){
+             console.log('Error removing item:', error);
+             console.log('Response:', xhr.responseText);
+             // window.location.reload(); 
+          }
+        });
       }); 
     });
   </script>

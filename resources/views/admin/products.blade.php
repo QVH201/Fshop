@@ -72,7 +72,7 @@
                             <td>{{$product->SKU}}</td>
                             <td>{{$product->category->name}}</td>
                             <td>{{$product->brand->name}}</td>
-                            <td>{{$product->feature ==0 ? "NO":"YES"}}</td>
+                            <td>{{$product->featured ==0 ? "NO":"YES"}}</td>
                             <td>{{$product->stock_status}}</td>
                             <td>{{$product->quantity}}</td>
                             <td>
@@ -110,19 +110,19 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('script')
     <script>
         $(function(){
             $('.delete').on('click', function(e){
                 e.preventDefault();
                 var form = $(this).closest('form');
-                Swal({
+                swal({
                     title: "Are you sure?",
                     text: "You want to delete this record?",
-                    type: "warning",
-                    buttons: ["No","Yes"],
-                    confirmButtonColor: '#bdf25aff'
-                }).then(function(result) {
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                    dangerMode: true,
+                }).then((result) => {
                     if (result) {
                         form.submit();
                     }          

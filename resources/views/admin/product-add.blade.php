@@ -42,7 +42,7 @@
                 <fieldset class="name">
                     <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
                     <input class="mb-10" type="text" placeholder="Enter product slug"
-                        name="slug" tabindex="0" value="{{ old('slug    ') }}" aria-required="true" required="">
+                        name="slug" tabindex="0" value="{{ old('slug') }}" aria-required="true" required="">
                     <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
                     @error('slug') <span class="alert-alert-danger text center">{{ $message }}</span> @enderror
@@ -201,7 +201,7 @@
 </div>
 @endsection
 
-@push('scripts')
+@push('script')
     <script>
         $(function() {
             $("#myFile").on('change',function(e) {
@@ -214,11 +214,13 @@
                 }
             });
 
-            $("#gFile").on('change',function(e) {
-                const photoInp = $("#gFile");
-                const [file] = this.files;
-                $.each(gphoto,function(index,val){
-                    $("#galUpload").prepend(`<div class="item gitems"><img src="${URL.createObjectURL(val)}"></div>`);
+            $("#gFile").on('change', function () {
+            $("#galUpload .gitems").remove(); // clear preview cũ (nên có)
+
+            const files = this.files;
+            $.each(files, function (index, file) {
+                $("#galUpload").prepend(`
+                    <div class="item gitems"> <img src="${URL.createObjectURL(file)}" /></div>  `);
                 });
             });
 

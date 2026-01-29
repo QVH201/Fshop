@@ -11,11 +11,71 @@ use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
 use Intervention\Image\Laravel\Facades\Image;
 
+use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Transaction;
+
 class AdminController extends Controller
 {
     public function index()
     {
-        return view('admin.index');
+        $orders = Order::orderBy('created_at','DESC')->take(10)->get();
+        $dashboardDatas = Order::selectRaw('status, count(*) as count, sum(total) as amount')->groupBy('status')->orderBy('status')->get();
+        $monthlyDatas = Order::selectRaw('MONTH(created_at) as month, MONTHNAME(created_at) as month_name, count(*) as count, sum(total) as amount')->groupBy('month', 'month_name')->orderBy('month')->get();
+        return view('admin.index', compact('orders', 'dashboardDatas','monthlyDatas'));
+    }
+
+    public function orders()
+    {
+        $orders = Order::orderBy('created_at','DESC')->paginate(10);
+        return view('admin.orders',compact('orders'));
+    }
+
+    public function order_details($order_id)
+    {
+        $order = Order::find($order_id);
+        $orderItems = OrderItem::where('order_id',$order_id)->orderBy('id')->get();
+        $transaction = Transaction::where('order_id',$order_id)->first();
+        return view('admin.order-details',compact('order','orderItems','transaction'));
+    }
+
+    public function update_order_status(Request $request)
+    {
+        $order = Order::find($request->order_id);
+        
+        if ($order->status == 'delivered' || $order->status == 'canceled') {
+            return back()->with('status', 'Order status cannot be changed once Delivered or Canceled!');
+        }
+
+        $order->status = $request->order_status;
+        
+        if($request->order_status == 'delivered')
+        {
+            $order->delivered_date = Carbon::now();
+        }
+        else if($request->order_status == 'canceled')
+        {
+            $order->canceled_date = Carbon::now();
+        }
+        
+        $order->save();
+        
+        if($request->order_status == 'delivered') {
+            $transaction = Transaction::where('order_id', $request->order_id)->first();
+            if($transaction) {
+                $transaction->status = 'approved';
+                $transaction->save();
+            }
+        } else if($request->order_status == 'canceled') {
+             $transaction = Transaction::where('order_id', $request->order_id)->first();
+            if($transaction) {
+                $transaction->status = 'declined';
+                $transaction->save();
+            }
+        }
+
+        return back()->with('status', 'Order status has been updated successfully!');
     }
     // Brand Methods
     public function brands()
@@ -224,7 +284,7 @@ class AdminController extends Controller
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
-        $current_timestamp = $request->current_timestamp;
+        $current_timestamp = Carbon::now()->timestamp;
         if($request->hasFile('image'))
         {   
             if (File::exists(public_path('uploads/products').'/'.$product->image)) {
@@ -250,8 +310,8 @@ class AdminController extends Controller
                 if (File::exists(public_path('uploads/products').'/'.$ofile)) {
                     File::delete(public_path('uploads/products').'/'.$ofile);
                 }
-                if (File::exists(public_path('uploads/products/thumbails').'/'.$ofile)) {
-                    File::delete(public_path('uploads/products/thumbails').'/'.$ofile);
+                if (File::exists(public_path('uploads/products/thumbnails').'/'.$ofile)) {
+                    File::delete(public_path('uploads/products/thumbnails').'/'.$ofile);
                 }
             }
 
@@ -271,8 +331,6 @@ class AdminController extends Controller
             $gallery_images = implode(',', $gallery_arr);
         }
         $product->images = $gallery_images;
-        $product->category_id = $request->category_id;
-        $product->brand_id = $request->brand_id;
         $product->save();
         return redirect()->route('admin.products')->with('status','Product has been added successfully !');
     }
@@ -329,7 +387,7 @@ class AdminController extends Controller
         $product->quantity = $request->quantity;
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
-        $current_timestamp = $request->current_timestamp;
+        $current_timestamp = Carbon::now()->timestamp;
 
         if($request->hasFile('image'))
         {        
@@ -340,7 +398,7 @@ class AdminController extends Controller
         }
 
         $gallery_arr = array();
-        $gallery_images = "";
+        $gallery_images = "NULL";
         $counter = 1;
 
         if($request->hasFile('images'))
@@ -380,8 +438,8 @@ class AdminController extends Controller
             if (File::exists(public_path('uploads/products').'/'.$ofile)) {
                 File::delete(public_path('uploads/products').'/'.$ofile);
             }
-            if (File::exists(public_path('uploads/products/thumbails').'/'.$ofile)) {
-                File::delete(public_path('uploads/products/thumbails').'/'.$ofile);
+            if (File::exists(public_path('uploads/products/thumbnails').'/'.$ofile)) {
+                File::delete(public_path('uploads/products/thumbnails').'/'.$ofile);
             }
         }
 

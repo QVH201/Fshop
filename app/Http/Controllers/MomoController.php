@@ -26,10 +26,10 @@ class MomoController extends Controller
             $vndAmount = (int)round($rawTotal * $exchangeRate);
             
             $amount = (string)$vndAmount;
-            $orderId = time() . "";
+            $orderId = (string) round(microtime(true) * 10000);
             $redirectUrl = route('momo.callback');
             $ipnUrl = route('momo.callback'); 
-            $requestId = time() . "";
+            $requestId = (string) round(microtime(true) * 10000);
             $requestType = "payWithATM";
             $extraData = "";
             
@@ -71,6 +71,7 @@ class MomoController extends Controller
             $jsonResult = json_decode($result, true); 
             
             if (isset($jsonResult['payUrl'])) {
+                Log::info("Redirecting to Momo: " . $jsonResult['payUrl']);
                 return Redirect::to($jsonResult['payUrl']);
             } else {
                 Log::error("Momo Payment Init Failed: " . $result);
@@ -134,7 +135,17 @@ class MomoController extends Controller
         );
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        
+        // Disable SSL verification for local development context
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
         $result = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            Log::error('Momo Curl Error: ' . curl_error($ch));
+        }
+
         curl_close($ch);
         return $result;
     }

@@ -28,7 +28,7 @@
             <h5 class="accordion-header" id="accordion-heading-1">
               <button class="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse"
                 data-bs-target="#accordion-filter-1" aria-expanded="true" aria-controls="accordion-filter-1">
-                Product Categories
+                Categories
                 <svg class="accordion-button__icon type2" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
                   <g aria-hidden="true" stroke="none" fill-rule="evenodd">
                     <path
@@ -57,7 +57,7 @@
         </div>
 
 
-        <div class="accordion" id="color-filters">
+        <!-- <div class="accordion" id="color-filters">
           <div class="accordion-item mb-4 pb-3">
             <h5 class="accordion-header" id="accordion-heading-1">
               <button class="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse"
@@ -89,10 +89,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
 
-        <div class="accordion" id="size-filters">
+        <!-- <div class="accordion" id="size-filters">
           <div class="accordion-item mb-4 pb-3">
             <h5 class="accordion-header" id="accordion-heading-size">
               <button class="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse"
@@ -120,7 +120,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
 
         <div class="accordion" id="brand-filters">
@@ -396,7 +396,7 @@
                       <use href="#icon_star" />
                     </svg>
                   </div>
-                  <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
+                  <!-- <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span> -->
                 </div>
 
                 @if (Cart::instance('wishlist')->content()->where('id',$product->id)->count()>0)

@@ -54,8 +54,8 @@
               <div class="swiper-container">
                 <div class="swiper-wrapper">
                   <div class="swiper-slide product-single__image-item"><img loading="lazy" class="h-auto"
-                      src="assets/images/products/product_0.jpg" width="104" height="104" alt="" /></div>
-                  <div class="{{asset('uploads/products')}}/{{ $product->image }}"><img loading="lazy" class="h-auto"
+                      src="{{asset('uploads/products')}}/{{ $product->image }}" width="104" height="104" alt="" /></div>
+                  <div class="swiper-slide product-single__image-item"><img loading="lazy" class="h-auto"
                       src="{{asset('uploads/products')}}/{{ $gimg }}" width="104" height="104" alt="" /></div>
                   
                 </div>
@@ -102,7 +102,7 @@
                 <use href="#icon_star" />
               </svg>
             </div>
-            <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
+            <!-- <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span> -->
           </div>
           <div class="product-single__price">
             <span class="current-price">
@@ -230,10 +230,10 @@
               href="#tab-additional-info" role="tab" aria-controls="tab-additional-info"
               aria-selected="false">Additional Information</a>
           </li>
-          <li class="nav-item" role="presentation">
+          <!-- <li class="nav-item" role="presentation">
             <a class="nav-link nav-link_underscore" id="tab-reviews-tab" data-bs-toggle="tab" href="#tab-reviews"
               role="tab" aria-controls="tab-reviews" aria-selected="false">Reviews (2)</a>
-          </li>
+          </li> -->
         </ul>
         <div class="tab-content">
           <div class="tab-pane fade show active" id="tab-description" role="tabpanel"
@@ -266,7 +266,7 @@
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="tab-reviews" role="tabpanel" aria-labelledby="tab-reviews-tab">
+          <!-- <div class="tab-pane fade" id="tab-reviews" role="tabpanel" aria-labelledby="tab-reviews-tab">
             <h2 class="product-single__reviews-title">Reviews</h2>
             <div class="product-single__reviews-list">
               <div class="product-single__reviews-item">
@@ -392,7 +392,7 @@
                 </div>
               </form>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>

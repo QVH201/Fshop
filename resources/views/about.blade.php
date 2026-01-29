@@ -28,7 +28,7 @@
             </div>
             <div class="mw-930 d-lg-flex align-items-lg-center">
                 <div class="image-wrapper col-lg-6">
-                    <img class="h-auto" loading="lazy" src="{{ asset('assets/images/about/about-2.jpg') }}" width="450" height="500" alt="Our Team">
+                    <img class="h-auto" loading="lazy" src="{{ asset('assets/images/about/about-2.jpg') }}" width="250" height="350" alt="Our Team">
                 </div>
                 <div class="content-wrapper col-lg-6 px-lg-4">
                     <h5 class="mb-3">The Company</h5>

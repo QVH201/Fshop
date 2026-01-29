@@ -44,7 +44,7 @@
                             <div class="my-account__address-item__detail">
                                 <p>{{$address->name}}</p>
                                 <p>{{$address->address}}</p>
-                                <p>{{$address->city}}, {{$address->state}}, {{$address->country}}</p>
+                                <p>{{$address->city}}, {{$address->state}}, {{$address->locality}}</p>
                                 <p>{{$address->zip}}</p>
                                 <br>
                                 <p>Mobile: {{$address->phone}}</p>

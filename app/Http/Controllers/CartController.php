@@ -109,6 +109,7 @@ class CartController extends Controller
     public function place_an_order(Request $request)
     {
         try {
+            \Illuminate\Support\Facades\Log::info("Place An Order Request Received");
             $user_id = Auth::user()->id;
             $address = Address::where('user_id', $user_id)->where('isdefault', true)->first();
             
@@ -138,6 +139,8 @@ class CartController extends Controller
                 $address->isdefault = true;
                 $address->save();
             }
+
+            \Illuminate\Support\Facades\Log::info("Validation Passed/Skipped. Proceeding to create order.");
 
             $this->setAmountForCheckout();
 

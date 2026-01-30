@@ -29,7 +29,7 @@
                                             </svg>
                                             <h5>Upload Your Photo</h5>
                                             <p class="text-muted small mb-3">Click or drag & drop</p>
-                                            <button type="button" class="btn btn-outline-primary" onclick="event.stopPropagation(); document.getElementById('modelImage').click()">
+                                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('modelImage').click()">
                                                 Choose File
                                             </button>
                                         </div>
@@ -74,7 +74,7 @@
                                                 </svg>
                                                 <h5>Upload Garment Photo</h5>
                                                 <p class="text-muted small mb-3">Click or drag & drop</p>
-                                                <button type="button" class="btn btn-outline-success" onclick="event.stopPropagation(); document.getElementById('garmentImage').click()">
+                                                <button type="button" class="btn btn-outline-success" onclick="document.getElementById('garmentImage').click()">
                                                     Choose File
                                                 </button>
                                             </div>
@@ -199,61 +199,116 @@
 }
 </style>
 
-@push('script')
 <script>
-// Image Preview Handlers
-document.getElementById('modelImage').addEventListener('change', function(e) {
-    previewImage(e.target, 'model');
-});
-
-@if(!isset($product))
-document.getElementById('garmentImage').addEventListener('change', function(e) {
-    previewImage(e.target, 'garment');
-});
-@endif
-
-function previewImage(input, type) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById(type + 'Preview');
-            preview.src = e.target.result;
-            document.querySelector(`#${type}UploadArea .upload-placeholder`).classList.add('d-none');
-            document.querySelector(`#${type}UploadArea .upload-preview`).classList.remove('d-none');
-        }
-        reader.readAsDataURL(input.files[0]);
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Virtual Try-On script loaded');
+    
+    // Image Preview Handlers
+    const modelImageInput = document.getElementById('modelImage');
+    console.log('Model image input found:', modelImageInput);
+    
+    if (modelImageInput) {
+        modelImageInput.addEventListener('change', function(e) {
+            console.log('Model image changed', e.target.files);
+            previewImage(e.target, 'model');
+        });
     }
-}
 
-function clearImage(type) {
-    document.getElementById(type + 'Image').value = '';
-    document.querySelector(`#${type}UploadArea .upload-placeholder`).classList.remove('d-none');
-    document.querySelector(`#${type}UploadArea .upload-preview`).classList.add('d-none');
-}
-
-// Drag & Drop
-const uploadAreas = ['modelUploadArea'];
-@if(!isset($product))
-    uploadAreas.push('garmentUploadArea');
-@endif
-
-uploadAreas.forEach(id => {
-    const area = document.getElementById(id);
-    if(!area) return;
+    @if(!isset($product))
+    const garmentImageInput = document.getElementById('garmentImage');
+    console.log('Garment image input found:', garmentImageInput);
     
-    const input = area.querySelector('input[type="file"]');
-    
-    area.addEventListener('click', () => input.click());
-    area.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        area.classList.add('dragover');
-    });
-    area.addEventListener('dragleave', () => area.classList.remove('dragover'));
-    area.addEventListener('drop', (e) => {
-        e.preventDefault();
-        area.classList.remove('dragover');
-        input.files = e.dataTransfer.files;
-        input.dispatchEvent(new Event('change'));
+    if (garmentImageInput) {
+        garmentImageInput.addEventListener('change', function(e) {
+            console.log('Garment image changed', e.target.files);
+            previewImage(e.target, 'garment');
+        });
+    }
+    @endif
+
+    function previewImage(input, type) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            console.log('Previewing file:', file.name, file.type, file.size);
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert('Vui lòng chọn file ảnh định dạng JPG, JPEG hoặc PNG!');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                alert('Kích thước file không được vượt quá 5MB!');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(type + 'Preview');
+                preview.src = e.target.result;
+                document.querySelector(`#${type}UploadArea .upload-placeholder`).classList.add('d-none');
+                document.querySelector(`#${type}UploadArea .upload-preview`).classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.clearImage = function(type) {
+        document.getElementById(type + 'Image').value = '';
+        document.querySelector(`#${type}UploadArea .upload-placeholder`).classList.remove('d-none');
+        document.querySelector(`#${type}UploadArea .upload-preview`).classList.add('d-none');
+    }
+
+    // Drag & Drop
+    const uploadAreas = ['modelUploadArea'];
+    @if(!isset($product))
+        uploadAreas.push('garmentUploadArea');
+    @endif
+
+    uploadAreas.forEach(id => {
+        const area = document.getElementById(id);
+        console.log('Setting up upload area:', id, area);
+        
+        if(!area) return;
+        
+        const input = area.querySelector('input[type="file"]');
+        const button = area.querySelector('button');
+        
+        console.log('Upload area elements:', {id, input, button});
+        
+        // Click on area (but not on button)
+        area.addEventListener('click', (e) => {
+            console.log('Upload area clicked', e.target);
+            
+            // Don't trigger if clicking on button or its children
+            if (button && (e.target === button || button.contains(e.target))) {
+                console.log('Clicked on button, skipping area handler');
+                return;
+            }
+            
+            console.log('Triggering file input click');
+            input.click();
+        });
+        
+        area.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            area.classList.add('dragover');
+        });
+        
+        area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+        
+        area.addEventListener('drop', (e) => {
+            e.preventDefault();
+            area.classList.remove('dragover');
+            console.log('Files dropped:', e.dataTransfer.files);
+            input.files = e.dataTransfer.files;
+            input.dispatchEvent(new Event('change'));
+        });
     });
 });
 
@@ -337,11 +392,12 @@ function showResult(imageUrl) {
     document.getElementById('downloadBtn').href = imageUrl;
 }
 
+
 function showError(message) {
     document.getElementById('processingState').classList.add('d-none');
     document.getElementById('errorState').classList.remove('d-none');
     document.getElementById('errorMessage').textContent = message;
 }
 </script>
-@endpush
+
 @endsection

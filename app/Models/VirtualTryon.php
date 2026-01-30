@@ -60,7 +60,7 @@ class VirtualTryon extends Model
      */
     public function getResultImageUrlAttribute()
     {
-        return $this->result_image ? asset('storage/' . $this->result_image) : null;
+        return $this->result_image ? asset($this->result_image) : null;
     }
 
     /**

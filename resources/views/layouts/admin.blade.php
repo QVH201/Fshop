@@ -42,7 +42,7 @@
                     <div class="box-logo">
                         <a href="{{route('admin.index')}}" id="site-logo-inner">
                             <img class="" id="logo_header_1" alt="" src="{{asset('images/logo/logo.png')}}"
-                                data-light="{{asset('images/logo/logo.png')}}" data-dark="{{asset('images/logo/logo.png')}}">
+                                data-light="{{asset('images/logo/logo.png')}}" data-dark="{{asset('images/logo/logo.png')}}" width="200" height="100">
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -397,7 +397,7 @@
                                             id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-user wg-user">
                                                 <span class="image">
-                                                    <img src="images/avatar/user-1.png" alt="">
+                                                    <img src="images/avatar/user.jpg" alt="">
                                                 </span>
                                                 <span class="flex flex-column">
                                                     <span class="body-title mb-2">Quach Hoa</span>

@@ -37,11 +37,34 @@ class VirtualTryonController extends Controller
      */
     public function upload(Request $request)
     {
+        // Log incoming request for debugging
+        Log::info('Virtual Try-On Upload Request', [
+            'has_model_image' => $request->hasFile('model_image'),
+            'has_garment_image' => $request->hasFile('garment_image'),
+            'product_id' => $request->product_id,
+            'clothing_type' => $request->clothing_type,
+            'model_image_info' => $request->hasFile('model_image') ? [
+                'name' => $request->file('model_image')->getClientOriginalName(),
+                'size' => $request->file('model_image')->getSize(),
+                'mime' => $request->file('model_image')->getMimeType(),
+            ] : null,
+        ]);
+
         $request->validate([
             'model_image' => 'required|image|mimes:jpeg,jpg,png|max:5120',
             'garment_image' => 'required_without:product_id|image|mimes:jpeg,jpg,png|max:5120',
             'product_id' => 'nullable|exists:products,id',
             'clothing_type' => 'required|in:upper,lower,full',
+        ], [
+            'model_image.required' => 'Vui lòng chọn ảnh của bạn',
+            'model_image.image' => 'File phải là ảnh',
+            'model_image.mimes' => 'Ảnh phải có định dạng: jpeg, jpg, png',
+            'model_image.max' => 'Kích thước ảnh không được vượt quá 5MB',
+            'garment_image.required_without' => 'Vui lòng chọn ảnh quần áo hoặc chọn sản phẩm',
+            'garment_image.image' => 'File phải là ảnh',
+            'garment_image.mimes' => 'Ảnh phải có định dạng: jpeg, jpg, png',
+            'garment_image.max' => 'Kích thước ảnh không được vượt quá 5MB',
+            'clothing_type.required' => 'Vui lòng chọn loại quần áo',
         ]);
 
         try {
@@ -157,9 +180,9 @@ class VirtualTryonController extends Controller
             $status = $response['status'];
 
             if ($status === 'COMPLETED') {
-                // Download result image from signed URL
-                $resultPath = 'virtual-tryon/results/' . Str::uuid() . '.jpg';
-                $fullPath = storage_path('app/public/' . $resultPath);
+                // Download result image from signed URL - save to public directory
+                $resultPath = 'uploads/virtual-tryon/results/' . Str::uuid() . '.jpg';
+                $fullPath = public_path($resultPath);
 
                 // Create directory if not exists
                 $dir = dirname($fullPath);
@@ -178,7 +201,7 @@ class VirtualTryonController extends Controller
 
                     return response()->json([
                         'status' => 'completed',
-                        'result_image' => asset('storage/' . $resultPath),
+                        'result_image' => asset($resultPath),
                         'processing_time' => $tryon->processing_time,
                     ]);
                 } else {

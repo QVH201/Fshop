@@ -128,12 +128,19 @@
                                                 <div class="text">Orders</div>
                                             </a>
                                         </li>
-                                        <!-- <li class="sub-menu-item">
-                                            <a href="order-tracking.html" class="">
-                                                <div class="text">Order tracking</div>
-                                            </a>
-                                        </li> -->
                                     </ul>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.reports') }}" class="">
+                                        <div class="icon"><i class="icon-alert-octagon"></i></div>
+                                        <div class="text">Reports</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.statistics') }}" class="">
+                                        <div class="icon"><i class="icon-bar-chart-2"></i></div>
+                                        <div class="text">Statistics</div>
+                                    </a>
                                 </li>
                                 <!-- <li class="menu-item">
                                     <a href="slider.html" class="">
@@ -326,7 +333,9 @@
                                         <button class="btn btn-secondary dropdown-toggle" type="button"
                                             id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="header-item">
-                                                <span class="text-tiny">1</span>
+                                                @if(isset($pendingCount) && $pendingCount > 0)
+                                                    <span class="text-tiny">{{ $pendingCount }}</span>
+                                                @endif
                                                 <i class="icon-bell"></i>
                                             </span>
                                         </button>
@@ -335,55 +344,24 @@
                                             <li>
                                                 <h6>Notifications</h6>
                                             </li>
-                                            <li>
-                                                <div class="message-item item-1">
-                                                    <div class="image">
-                                                        <i class="icon-noti-1"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Discount available</div>
-                                                        <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus
-                                                            at, ullamcorper nec diam</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-2">
-                                                    <div class="image">
-                                                        <i class="icon-noti-2"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Account has been verified</div>
-                                                        <div class="text-tiny">Mauris libero ex, iaculis vitae rhoncus
-                                                            et</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-3">
-                                                    <div class="image">
-                                                        <i class="icon-noti-3"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Order shipped successfully</div>
-                                                        <div class="text-tiny">Integer aliquam eros nec sollicitudin
-                                                            sollicitudin</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-4">
-                                                    <div class="image">
-                                                        <i class="icon-noti-4"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Order pending: <span>ID 305830</span>
+                                            @if(isset($pendingReports) && count($pendingReports) > 0)
+                                                @foreach($pendingReports as $report)
+                                                <li>
+                                                    <a href="{{ route('admin.report.details', $report->id) }}" class="message-item">
+                                                        <div class="image">
+                                                            <i class="icon-alert-triangle"></i>
                                                         </div>
-                                                        <div class="text-tiny">Ultricies at rhoncus at ullamcorper</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><a href="#" class="tf-button w-full">View all</a></li>
+                                                        <div>
+                                                            <div class="body-title-2">{{ \Illuminate\Support\Str::limit($report->title, 20) }}</div>
+                                                            <div class="text-tiny">{{ $report->created_at->diffForHumans() }}</div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                @endforeach
+                                                <li><a href="{{ route('admin.reports') }}" class="tf-button w-full">View all</a></li>
+                                            @else
+                                                <li><div class="message-item"><div class="text-tiny">No new reports</div></div></li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </div>

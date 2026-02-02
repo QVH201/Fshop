@@ -475,6 +475,17 @@
           </div>
           @endguest
 
+          <div class="header-tools__item">
+             <a class="header-tools__item header-tools__cart" href="{{ route('user.notifications') }}">
+                <i class="fa fa-bell" style="font-size: 20px;"></i>
+                @if(isset($userNotificationCount) && $userNotificationCount > 0)
+                  <span class="cart-amount d-block position-absolute js-cart-items-count">{{$userNotificationCount}}</span>
+                @endif
+              </a>
+          </div>
+
+
+
           <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_heart" />

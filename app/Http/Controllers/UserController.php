@@ -153,4 +153,15 @@ class UserController extends Controller
         }
         return redirect()->route('user.addresses');
     }
+
+    public function notifications()
+    {
+        $notifications = \App\Models\Report::where('user_id', Auth::user()->id)
+            ->where('status', 'replied')
+            ->orderBy('is_read', 'asc') // Unread first
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        return view('user.notifications', compact('notifications'));
+    }
 }

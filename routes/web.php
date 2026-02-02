@@ -19,6 +19,7 @@ Route::view('/contact', 'contact')->name('home.contact');
 
 Route::get('/shop',[ShopController::class,'index'])->name('shop.index');
 Route::get('/shop/{product_slug}',[ShopController::class,'product_details'])->name('shop.product.details');
+Route::post('/shop/report', [App\Http\Controllers\ReportController::class, 'store'])->name('shop.report.store');
 
 Route::get('/cart',[CartController::class,'index'])->name('cart.index');
 Route::post('/cart/add',[CartController::class,'add_to_cart'])->name('cart.add');
@@ -45,6 +46,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/account-dashboard/address/store', [UserController::class, 'store_address'])->name('user.address.store');
     Route::get('/account-dashboard/address/edit/{id}', [UserController::class, 'edit_address'])->name('user.address.edit');
     Route::put('/account-dashboard/address/update/{id}', [UserController::class, 'update_address'])->name('user.address.update');
+    Route::get('/account-dashboard/notifications', [UserController::class, 'notifications'])->name('user.notifications');
 });
 
 Route::middleware(['auth',AuthAdmin::class])->group(function(){
@@ -71,6 +73,12 @@ Route::middleware(['auth',AuthAdmin::class])->group(function(){
     Route::get('/admin/orders',[AdminController::class,'orders'])->name('admin.orders');
     Route::get('/admin/orders/{order_id}',[AdminController::class,'order_details'])->name('admin.order.details');
     Route::put('/admin/order/update-status',[AdminController::class,'update_order_status'])->name('admin.order.status.update');
+
+    Route::get('/admin/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::get('/admin/reports/{id}', [AdminController::class, 'report_details'])->name('admin.report.details');
+    Route::post('/admin/reports/{id}/reply', [AdminController::class, 'reply_report'])->name('admin.report.reply');
+
+    Route::get('/admin/statistics', [AdminController::class, 'statistics'])->name('admin.statistics');
 
     Route::delete('/admin/product/{id}/delete',[AdminController::class,'product_delete'])->name('admin.product.delete');
 }); 

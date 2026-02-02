@@ -7,6 +7,27 @@
 </style>
   <main class="pt-90">
     <div class="mb-md-1 pb-md-3"></div>
+    <div class="mb-md-1 pb-md-3"></div>
+    
+    <div class="container">
+        @if(session('status'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{session('status')}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{$error}}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+    </div>
+
     <section class="product-single container">
       <div class="row">
         <div class="col-lg-7">
@@ -202,6 +223,51 @@
             </share-button>
             <script src="js/details-disclosure.html" defer="defer"></script>
             <script src="js/share.html" defer="defer"></script>
+          </div>
+          <div class="product-single__meta-info">
+             <div class="meta-item">
+               <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal">
+                   Report Product
+               </button>
+             </div>
+          </div>
+          
+          <!-- Report Modal -->
+          <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form action="{{ route('shop.report.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="reportModalLabel">Report Product</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="sender_name" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="sender_name" name="sender_name" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="email" class="form-label">Your Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="title" class="form-label">Report Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="content" class="form-label">Reason/Details</label>
+                        <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Submit Report</button>
+                    </div>
+                </form>
+              </div>
+            </div>
           </div>
           <div class="product-single__meta-info">
             <div class="meta-item">
@@ -438,23 +504,23 @@
             @foreach ($rproducts as $rproduct)
             <div class="swiper-slide product-card">
               <div class="pc__img-wrapper">
-                <a href="{{ route('shop.product.details',['product_slug'=>$product->slug]) }}">
+                <a href="{{ route('shop.product.details',['product_slug'=>$rproduct->slug]) }}">
                   <img loading="lazy" src="{{asset('uploads/products')}}/{{ $rproduct->image }}" width="330" height="400"
                     alt="{{$rproduct->name}}" class="pc__img">
-                  @foreach (explode(',',$product->images) as $gimg)
+                  @foreach (explode(',',$rproduct->images) as $gimg)
                   <img loading="lazy" src="{{asset('uploads/products')}}/{{ $gimg }}" width="330" height="400"
                     alt="{{$rproduct->name}}" class="pc__img pc__img-second">
                   @endforeach
                 </a>
-                @if(Cart::instance('cart')->content()->where('id',$product->id)->count()>0)
+                @if(Cart::instance('cart')->content()->where('id',$rproduct->id)->count()>0)
                   <a href="{{ route('cart.index') }}" class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium btn-warning mb-3">Go to Cart</a>
                 @else
                   <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
                   @csrf
-                    <input type="hidden" name="id" value="{{ $product->id }}"/>
+                    <input type="hidden" name="id" value="{{ $rproduct->id }}"/>
                     <input type="hidden" name="quantity" value="1"/>
-                    <input type="hidden" name="name" value="{{ $product->name }}"/>
-                    <input type="hidden" name="price" value="{{ $product->sale_price == '' ? $product->regular_price : $product->sale_price }}"/>
+                    <input type="hidden" name="name" value="{{ $rproduct->name }}"/>
+                    <input type="hidden" name="price" value="{{ $rproduct->sale_price == '' ? $rproduct->regular_price : $rproduct->sale_price }}"/>
                 <button
                   type="submit" class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium"
                   data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
@@ -464,13 +530,13 @@
 
               <div class="pc__info position-relative">
                 <p class="pc__category">{{$rproduct->category->name}}</p>
-                <h6 class="pc__title"><a href="{{ route('shop.product.details',['product_slug'=>$product->slug]) }}">{{$rproduct->name}}</a></h6>
+                <h6 class="pc__title"><a href="{{ route('shop.product.details',['product_slug'=>$rproduct->slug]) }}">{{$rproduct->name}}</a></h6>
                 <div class="product-card__price d-flex">
                   <span class="money price">
-                    @if($product->sale_price) 
-                      <s>${{ $product->regular_price }}</s> ${{ $product->sale_price }}
+                    @if($rproduct->sale_price) 
+                      <s>${{ $rproduct->regular_price }}</s> ${{ $rproduct->sale_price }}
                     @else
-                      ${{ $product->regular_price }} 
+                      ${{ $rproduct->regular_price }} 
                     @endif
                   </span>
                 </div>

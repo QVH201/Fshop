@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Transaction;
+use App\Models\Report;
+
 
 class AdminController extends Controller
 {
@@ -446,4 +448,63 @@ class AdminController extends Controller
        $product->delete();
        return redirect()->route('admin.products')->with('status','Product has been deleted successfully !');
    } 
+
+    // Report Methods
+    public function reports()
+    {
+        $reports = Report::orderBy('created_at','DESC')->paginate(10);
+        return view('admin.reports', compact('reports'));
+    }
+
+    public function statistics()
+    {
+        // Sales by Category
+        $catStats = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('categories.name', DB::raw('SUM(order_items.quantity * order_items.price) as total_sales'), DB::raw('SUM(order_items.quantity) as total_qty'))
+            ->groupBy('categories.name')
+            ->orderBy('total_sales', 'DESC')
+            ->get();
+
+        // Sales by Brand
+        $brandStats = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('brands', 'products.brand_id', '=', 'brands.id')
+            ->select('brands.name', DB::raw('SUM(order_items.quantity * order_items.price) as total_sales'), DB::raw('SUM(order_items.quantity) as total_qty'))
+            ->groupBy('brands.name')
+            ->orderBy('total_sales', 'DESC')
+            ->get();
+
+        // Sales by Product
+        $prodStats = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->select('products.name', 'products.id', DB::raw('SUM(order_items.quantity * order_items.price) as total_sales'), DB::raw('SUM(order_items.quantity) as total_qty'))
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('total_sales', 'DESC')
+            ->paginate(10);
+
+        return view('admin.statistics', compact('catStats', 'brandStats', 'prodStats'));
+    }
+
+    public function report_details($id)
+    {
+        $report = Report::findOrFail($id);
+        return view('admin.report-details', compact('report'));
+    }
+
+    public function reply_report(Request $request, $id)
+    {
+        $request->validate([
+            'reply' => 'required|string',
+        ]);
+
+        $report = Report::findOrFail($id);
+        
+        $report->status = 'replied';
+        $report->reply_content = $request->reply;
+        $report->is_read = false;
+        $report->save();
+        return back()->with('status', 'Reply saved successfully!');
+    }
 }

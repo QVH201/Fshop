@@ -457,7 +457,7 @@
           @endforeach
             </div>
           </div>
-          <div class="col-6 col-md-4 col-lg-3">
+          <!-- <div class="col-6 col-md-4 col-lg-3">
             <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
               <div class="pc__img-wrapper">
                 <a href="details.html">
@@ -565,7 +565,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div><!-- /.row -->
 
         <div class="text-center mt-2">
